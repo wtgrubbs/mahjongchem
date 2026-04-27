@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chemistry Mahjong</title>
+    <style>
+        :root {
+            --bg-color: #0a1128;
+            --panel-bg: rgba(16, 33, 65, 0.85);
+            --text-color: #00f0ff;
+            --accent-color: #4facfe;
+            
+            /* Lighter, brighter shades of blue */
+            --tile-bg-1: #6abdf7; 
+            --tile-bg-2: #3f9be6;
+            --tile-edge-bottom: #1f64a3;
+            --tile-edge-right: #2877c2;
+            --tile-shadow: rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='rgba(79, 172, 254, 0.2)' stroke-width='3' fill='rgba(79, 172, 254, 0.05)'%3E%3Cg transform='translate(60, 60) rotate(15)'%3E%3Cline x1='0' y1='0' x2='0' y2='-30'/%3E%3Cline x1='0' y1='0' x2='-28' y2='10'/%3E%3Cline x1='0' y1='0' x2='28' y2='10'/%3E%3Cline x1='0' y1='0' x2='0' y2='20' stroke-dasharray='4,4'/%3E%3Ccircle cx='0' cy='0' r='12'/%3E%3Ccircle cx='0' cy='-30' r='6'/%3E%3Ccircle cx='-28' cy='10' r='6'/%3E%3Ccircle cx='28' cy='10' r='6'/%3E%3Ccircle cx='0' cy='20' r='6'/%3E%3C/g%3E%3Cg transform='translate(240, 80) rotate(-30)'%3E%3Cline x1='0' y1='0' x2='-20' y2='25'/%3E%3Cline x1='0' y1='0' x2='20' y2='25'/%3E%3Ccircle cx='0' cy='0' r='12'/%3E%3Ccircle cx='-20' cy='25' r='6'/%3E%3Ccircle cx='20' cy='25' r='6'/%3E%3C/g%3E%3Cg transform='translate(150, 180) rotate(45)'%3E%3Cline x1='0' y1='0' x2='0' y2='28'/%3E%3Cline x1='0' y1='0' x2='-24' y2='-14'/%3E%3Cline x1='0' y1='0' x2='24' y2='-14'/%3E%3Ccircle cx='0' cy='0' r='14'/%3E%3Ccircle cx='0' cy='28' r='6'/%3E%3Ccircle cx='-24' cy='-14' r='6'/%3E%3Ccircle cx='24' cy='-14' r='6'/%3E%3C/g%3E%3Cg transform='translate(50, 240) rotate(60)'%3E%3Cline x1='0' y1='0' x2='-20' y2='25'/%3E%3Cline x1='0' y1='0' x2='20' y2='25'/%3E%3Ccircle cx='0' cy='0' r='12'/%3E%3Ccircle cx='-20' cy='25' r='6'/%3E%3Ccircle cx='20' cy='25' r='6'/%3E%3C/g%3E%3Cg transform='translate(250, 250) rotate(-45)'%3E%3Cline x1='0' y1='0' x2='0' y2='-30'/%3E%3Cline x1='0' y1='0' x2='-28' y2='10'/%3E%3Cline x1='0' y1='0' x2='28' y2='10'/%3E%3Cline x1='0' y1='0' x2='0' y2='20' stroke-dasharray='4,4'/%3E%3Ccircle cx='0' cy='0' r='12'/%3E%3Ccircle cx='0' cy='-30' r='6'/%3E%3Ccircle cx='-28' cy='10' r='6'/%3E%3Ccircle cx='28' cy='10' r='6'/%3E%3Ccircle cx='0' cy='20' r='6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #header {
+            background: var(--panel-bg);
+            border-bottom: 2px solid var(--accent-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .title-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            white-space: nowrap;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        select, button {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-family: inherit;
+        }
+
+        select option {
+            background-color: #555555; 
+            color: var(--text-color); 
+        }
+
+        select option:checked {
+            background-color: #222222; 
+            color: #ffffff; 
+        }
+
+        select:hover, button:hover {
+            background: rgba(79, 172, 254, 0.2);
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #mute-btn {
+            width: 40px;
+            padding: 8px 0;
+            text-align: center;
+        }
+
+        #game-area {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #board-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #board {
+            position: relative;
+            transform-origin: center center;
+            transition: transform 0.3s ease-out;
+        }
+
+        .tile {
+            position: absolute;
+            width: 118px; 
+            height: 58px;
+            background: linear-gradient(135deg, var(--tile-bg-1) 0%, var(--tile-bg-2) 100%);
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            
+            box-shadow: 
+                -2px 2px 0px var(--tile-edge-bottom),
+                -3px 3px 0px var(--tile-edge-bottom),
+                -4px 4px 6px var(--tile-shadow),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.6),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+                
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+            z-index: 1;
+        }
+
+        .tile .content {
+            display: inline-block;
+            text-align: center;
+            line-height: 1.1;
+            padding: 0 5px;
+        }
+
+        .tile .content.left { font-size: 14px; }
+        .tile .content.right { font-size: 18px; }
+
+        .tile sub { font-size: 0.6em; vertical-align: sub; }
+        .tile sup { font-size: 0.6em; vertical-align: super; }
+
+        .tile:hover { filter: brightness(1.1); }
+
+        .tile.selected {
+            border-color: #ff9900;
+            box-shadow: 
+                0 0 15px rgba(255, 153, 0, 0.9),
+                -2px 2px 0px #995500,
+                -3px 3px 0px #995500,
+                -4px 4px 6px rgba(0, 0, 0, 0.7),
+                inset 0 0 10px rgba(255, 153, 0, 0.6);
+            transform: translate(2px, -2px);
+            z-index: 1000 !important;
+        }
+
+        .tile.hinted {
+            animation: pulse-hint 1.5s infinite;
+        }
+
+        @keyframes pulse-hint {
+            0% { box-shadow: 0 0 5px #ffffff, -3px 3px 0px var(--tile-edge-bottom); }
+            50% { box-shadow: 0 0 20px #ffffff, -3px 3px 0px var(--tile-edge-bottom); }
+            100% { box-shadow: 0 0 5px #ffffff, -3px 3px 0px var(--tile-edge-bottom); }
+        }
+
+        .tile.blocked {
+            filter: brightness(0.5);
+            cursor: not-allowed;
+        }
+
+        #win-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 17, 40, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #win-overlay h2 {
+            font-size: 48px;
+            color: #00f0ff;
+            text-shadow: 0 0 20px #4facfe;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #rules-modal {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .rules-content {
+            background: var(--panel-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+
+        .rules-content h3 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #00f0ff;
+        }
+
+        .rules-content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 1050px) {
+            h1 { font-size: 14px; }
+            .controls { gap: 4px; }
+            select, button { padding: 6px 8px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <div class="title-area">
+            <h1 id="game-title-header">Mahjong Chem</h1>
+        </div>
+        <div class="controls">
+            <button id="rules-btn">Rules</button>
+            <select id="mode-select">
+                <option value="oxidation" selected>Oxidation</option>
+                <option value="polyIntro">Polyatomic-Simple</option>
+                <option value="polyAdv">Polyatomic-Advanced</option>
+                <option value="elemIntro">Element Symbols (Intro)</option>
+                <option value="elemAdv">Element Symbols (Adv.)</option>
+                <option value="prefixes">Metric Prefixes</option>
+            </select>
+            <select id="layout-select">
+                <option value="simple">Simple-36 Tiles</option>
+                <option value="intermediate" selected>Inter.-54 Tiles</option>
+                <option value="advanced">Adv.-76 Tiles</option>
+            </select>
+            <button id="new-game-btn">New Game</button>
+            <button id="hint-btn">Hint</button>
+            <button id="shuffle-btn">Shuffle</button>
+            <button id="mute-btn" title="Mute Audio">🔊</button>
+        </div>
+    </div>
+
+    <div id="game-area">
+        <div id="board-container">
+            <div id="board"></div>
+        </div>
+        
+        <div id="win-overlay">
+            <h2>Reaction Complete!</h2>
+            <button id="play-again-btn">Synthesize Again</button>
+        </div>
+
+        <div id="rules-modal">
+            <div class="rules-content">
+                <h3>Rules</h3>
+                <p id="rules-text"></p>
+                <button id="close-rules-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameDatasets = {
+            oxidation: {
+                title: "Mahjong Chem - Oxidation",
+                rules: "To eliminate tiles, match a compound/ion tile with the correct oxidation number tile (where the oxidation number refers to the atom/ion displayed in yellow).",
+                pairs: [
+                    { left: "[Si]H₄", right: "-4" }, { left: "[C]H₄", right: "-4" },
+                    { left: "K₃[N]", right: "-3" }, { left: "[P]H₃", right: "-3" },
+                    { left: "[N]H₄I", right: "-3" }, { left: "[N]H₃", right: "-3" },
+                    { left: "[S]²⁻", right: "-2" }, { left: "K₂[S]", right: "-2" },
+                    { left: "[C]₂H₄", right: "-2" }, { left: "H₂[O]₂", right: "-1" },
+                    { left: "[C]₆H₆", right: "-1" }, { left: "Li[F]", right: "-1" },
+                    { left: "Na₂[O]₂", right: "-1" }, { left: "[Ar]", right: "0" },
+                    { left: "[O]₃", right: "0" }, { left: "[Cl]₂", right: "0" },
+                    { left: "[Na]", right: "0" }, { left: "[O]₂", right: "0" },
+                    { left: "[H]₂O", right: "1" }, { left: "[Li]⁺", right: "1" },
+                    { left: "[H]Br", right: "1" }, { left: "[K]Cl", right: "1" },
+                    { left: "[Zn]²⁺", right: "2" }, { left: "[Cu]S", right: "2" },
+                    { left: "[Mg]SO₄", right: "2" }, { left: "[Al]Cl₃", right: "3" },
+                    { left: "[N]O₂⁻", right: "3" }, { left: "[Fe]Cl₃", right: "3" },
+                    { left: "[C]O₃²⁻", right: "4" }, { left: "[Ni]O₂", right: "4" },
+                    { left: "[N]₂O₄", right: "4" }, { left: "[C]O₂", right: "4" },
+                    { left: "[P]Cl₅", right: "5" }, { left: "H[N]O₃", right: "5" },
+                    { left: "H₃[P]O₄", right: "5" }, { left: "[Cr]O₄²⁻", right: "6" },
+                    { left: "[S]F₆", right: "6" }, { left: "Ca[S]O₄", right: "6" }
+                ]
+            },
+            polyIntro: {
+                title: "Mahjong Chem - Polyatomic",
+                rules: "To eliminate tiles, match each polyatomic ion with its correct name.",
+                pairs: [
+                    { left: "Ammonium", right: "NH<sub>4</sub><sup>+</sup>" },
+                    { left: "Hydronium", right: "H<sub>3</sub>O<sup>+</sup>" },
+                    { left: "Acetate", right: "C<sub>2</sub>H<sub>3</sub>O<sub>2</sub><sup>-</sup>" },
+                    { left: "Chlorate", right: "ClO<sub>3</sub><sup>-</sup>" },
+                    { left: "Chlorite", right: "ClO<sub>2</sub><sup>-</sup>" },
+                    { left: "Cyanide", right: "CN<sup>-</sup>" },
+                    { left: "Hydroxide", right: "OH<sup>-</sup>" },
+                    { left: "Hypochlorite", right: "ClO<sup>-</sup>" },
+                    { left: "Nitrate", right: "NO<sub>3</sub><sup>-</sup>" },
+                    { left: "Nitrite", right: "NO<sub>2</sub><sup>-</sup>" },
+                    { left: "Perchlorate", right: "ClO<sub>4</sub><sup>-</sup>" },
+                    { left: "Carbonate", right: "CO<sub>3</sub><sup>2-</sup>" },
+                    { left: "Chromate", right: "CrO<sub>4</sub><sup>2-</sup>" },
+                    { left: "Peroxide", right: "O<sub>2</sub><sup>2-</sup>" },
+                    { left: "Sulfate", right: "SO<sub>4</sub><sup>2-</sup>" },
+                    { left: "Sulfite", right: "SO<sub>3</sub><sup>2-</sup>" },
+                    { left: "Phosphate", right: "PO<sub>4</sub><sup>3-</sup>" }
+                ]
+            },
+            polyAdv: {
+                title: "Mahjong Chem - Polyatomic",
+                rules: "To eliminate tiles, match each polyatomic ion with its correct name.",
+                pairs: [
+                    { left: "Ammonium", right: "NH<sub>4</sub><sup>+</sup>" },
+                    { left: "Hydronium", right: "H<sub>3</sub>O<sup>+</sup>" },
+                    { left: "Acetate", right: "C<sub>2</sub>H<sub>3</sub>O<sub>2</sub><sup>-</sup>" },
+                    { left: "Bromate", right: "BrO<sub>3</sub><sup>-</sup>" },
+                    { left: "Chlorate", right: "ClO<sub>3</sub><sup>-</sup>" },
+                    { left: "Chlorite", right: "ClO<sub>2</sub><sup>-</sup>" },
+                    { left: "Cyanide", right: "CN<sup>-</sup>" },
+                    { left: "Dihydrogen phosphate", right: "H<sub>2</sub>PO<sub>4</sub><sup>-</sup>" },
+                    { left: "Hydrogen carbonate", right: "HCO<sub>3</sub><sup>-</sup>" },
+                    { left: "Hydrogen sulfate", right: "HSO<sub>4</sub><sup>-</sup>" },
+                    { left: "Hydroxide", right: "OH<sup>-</sup>" },
+                    { left: "Hypochlorite", right: "ClO<sup>-</sup>" },
+                    { left: "Iodate", right: "IO<sub>3</sub><sup>-</sup>" },
+                    { left: "Nitrate", right: "NO<sub>3</sub><sup>-</sup>" },
+                    { left: "Nitrite", right: "NO<sub>2</sub><sup>-</sup>" },
+                    { left: "Perchlorate", right: "ClO<sub>4</sub><sup>-</sup>" },
+                    { left: "Permanganate", right: "MnO<sub>4</sub><sup>-</sup>" },
+                    { left: "Thiocyanate", right: "SCN<sup>-</sup>" },
+                    { left: "Carbonate", right: "CO<sub>3</sub><sup>2-</sup>" },
+                    { left: "Chromate", right: "CrO<sub>4</sub><sup>2-</sup>" },
+                    { left: "Dichromate", right: "Cr<sub>2</sub>O<sub>7</sub><sup>2-</sup>" },
+                    { left: "Hydrogen phosphate", right: "HPO<sub>4</sub><sup>2-</sup>" },
+                    { left: "Oxalate", right: "C<sub>2</sub>O<sub>4</sub><sup>2-</sup>" },
+                    { left: "Peroxide", right: "O<sub>2</sub><sup>2-</sup>" },
+                    { left: "Sulfate", right: "SO<sub>4</sub><sup>2-</sup>" },
+                    { left: "Sulfite", right: "SO<sub>3</sub><sup>2-</sup>" },
+                    { left: "Thiosulfate", right: "S<sub>2</sub>O<sub>3</sub><sup>2-</sup>" },
+                    { left: "Arsenate", right: "AsO<sub>4</sub><sup>3-</sup>" },
+                    { left: "Phosphate", right: "PO<sub>4</sub><sup>3-</sup>" },
+                    { left: "Phosphite", right: "PO<sub>3</sub><sup>3-</sup>" }
+                ]
+            },
+            elemIntro: {
+                title: "Mahjong Chem - Element Symbols",
+                rules: "To eliminate tiles, match each element name with its correct elemental symbol.",
+                pairs: [
+                    { left: "Beryllium", right: "Be" }, { left: "Boron", right: "B" },
+                    { left: "Bromine", right: "Br" }, { left: "Bismuth", right: "Bi" },
+                    { left: "Nickel", right: "Ni" }, { left: "Sodium", right: "Na" },
+                    { left: "Calcium", right: "Ca" }, { left: "Copper", right: "Cu" },
+                    { left: "Iron", right: "Fe" }, { left: "Silver", right: "Ag" },
+                    { left: "Gold", right: "Au" }, { left: "Mercury", right: "Hg" },
+                    { left: "Tin", right: "Sn" }, { left: "Lead", right: "Pb" },
+                    { left: "Indium", right: "In" }
+                ]
+            },
+            elemAdv: {
+                title: "Mahjong Chem - Element Symbols",
+                rules: "To eliminate tiles, match each element name with its correct elemental symbol.",
+                pairs: [
+                    { left: "Sodium", right: "Na" }, { left: "Polonium", right: "Po" },
+                    { left: "Rhodium", right: "Rh" }, { left: "Rubidium", right: "Rb" },
+                    { left: "Rhenium", right: "Re" }, { left: "Tin", right: "Sn" },
+                    { left: "Gold", right: "Au" }, { left: "Silver", right: "Ag" },
+                    { left: "Calcium", right: "Ca" }, { left: "Cerium", right: "Ce" },
+                    { left: "Cobalt", right: "Co" }, { left: "Copper", right: "Cu" },
+                    { left: "Cesium", right: "Cs" }, { left: "Lead", right: "Pb" },
+                    { left: "Silicon", right: "Si" }
+                ]
+            },
+            prefixes: {
+                title: "Mahjong Chem - Metric Prefixes",
+                rules: "To eliminate tiles, match each metric prefix with the appropriate power of 10.",
+                pairs: [
+                    { left: "Giga(G)", right: "10⁹" }, { left: "Mega(M)", right: "10⁶" },
+                    { left: "Kilo(k)", right: "10³" }, { left: "Deci(d)", right: "10⁻¹" },
+                    { left: "Centi(c)", right: "10⁻²" }, { left: "Milli(m)", right: "10⁻³" },
+                    { left: "Micro(μ)", right: "10⁻⁶" }, { left: "Nano(n)", right: "10⁻⁹" },
+                    { left: "Pico(p)", right: "10⁻¹²" }, { left: "Femto(f)", right: "10⁻¹⁵" }
+                ]
+            }
+        };
+
+        function createGrid(startX, startY, cols, rows, z) {
+            let tiles = [];
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                    tiles.push({ x: startX + (c * 2), y: startY + (r * 2), z: z });
+                }
+            }
+            return tiles;
+        }
+
+        const layouts = {
+            "simple": [
+                ...createGrid(0, 0, 6, 5, 0),
+                ...createGrid(4, 2, 2, 3, 1)
+            ],
+            "intermediate": [
+                ...createGrid(0, 0, 6, 7, 0),
+                ...createGrid(2, 4, 4, 3, 1),
+            ],
+            "advanced": [
+                ...createGrid(0, 0, 8, 7, 0),
+                ...createGrid(2, 4, 6, 3, 1),
+                ...createGrid(6, 6, 2, 1, 2)
+            ]
+        };
+
+        const TILE_WIDTH_UNIT = 60;
+        const TILE_HEIGHT_UNIT = 30;
+
+        const audioSelect = new Audio('select.mp3');
+        const audioMatch = new Audio('match.mp3');
+        let isMuted = false;
+
+        function playClick() {
+            if (isMuted) return;
+            audioSelect.currentTime = 0;
+            audioSelect.play().catch(e => console.warn("Audio play blocked:", e));
+        }
+
+        function playSwoosh() {
+            if (isMuted) return;
+            audioMatch.currentTime = 0;
+            audioMatch.play().catch(e => console.warn("Audio play blocked:", e));
+        }
+
+        let activeTiles = [];
+        let selectedTile = null;
+
+        const boardEl = document.getElementById('board');
+        const boardContainer = document.getElementById('board-container');
+        const winOverlay = document.getElementById('win-overlay');
+        const rulesModal = document.getElementById('rules-modal');
+        const rulesText = document.getElementById('rules-text');
+        const titleHeader = document.getElementById('game-title-header');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateDeck(numTiles) {
+            const mode = document.getElementById('mode-select').value;
+            const currentDataset = gameDatasets[mode].pairs;
+            
+            const numPairs = numTiles / 2;
+            let deck = [];
+            
+            for (let i = 0; i < numPairs; i++) {
+                const pairIndex = Math.floor(Math.random() * currentDataset.length);
+                const pair = currentDataset[pairIndex];
+                
+                const matchGroupId = pair.right;
+
+                deck.push({ matchKey: matchGroupId, type: 'left', content: pair.left });
+                deck.push({ matchKey: matchGroupId, type: 'right', content: pair.right });
+            }
+            
+            return shuffleArray(deck);
+        }
+
+        function isTileFree(tileObj) {
+            let topBlocked = false;
+            let leftBlocked = false;
+            let rightBlocked = false;
+
+            for (let other of activeTiles) {
+                if (other === tileObj) continue;
+
+                const overlapsY = Math.abs(other.y - tileObj.y) < 2;
+
+                if (overlapsY) {
+                    if (other.z === tileObj.z + 1) {
+                        if (Math.abs(other.x - tileObj.x) < 2) {
+                            topBlocked = true;
+                            break; 
+                        }
+                    }
+
+                    if (other.z === tileObj.z) {
+                        if (other.x === tileObj.x - 2) leftBlocked = true;
+                        if (other.x === tileObj.x + 2) rightBlocked = true;
+                    }
+                }
+            }
+
+            if (topBlocked) return false;
+            if (leftBlocked && rightBlocked) return false;
+            return true;
+        }
+
+        function updateTileVisuals() {
+            for (let t of activeTiles) {
+                if (!isTileFree(t)) {
+                    t.element.classList.add('blocked');
+                } else {
+                    t.element.classList.remove('blocked');
+                }
+            }
+        }
+
+        function clearSelection() {
+            if (selectedTile) {
+                selectedTile.element.classList.remove('selected');
+                selectedTile = null;
+            }
+            document.querySelectorAll('.hinted').forEach(el => el.classList.remove('hinted'));
+        }
+
+        function handleTileClick(tileObj) {
+            if (!isTileFree(tileObj)) return;
+
+            clearSelectionHints(); 
+
+            if (selectedTile === null) {
+                selectedTile = tileObj;
+                tileObj.element.classList.add('selected');
+                playClick();
+            } else if (selectedTile === tileObj) {
+                selectedTile.element.classList.remove('selected');
+                selectedTile = null;
+                playClick();
+            } else {
+                const match = (selectedTile.matchKey === tileObj.matchKey) && (selectedTile.type !== tileObj.type);
+
+                if (match) {
+                    playSwoosh();
+                    selectedTile.element.remove();
+                    tileObj.element.remove();
+                    
+                    activeTiles = activeTiles.filter(t => t !== selectedTile && t !== tileObj);
+                    selectedTile = null;
+                    
+                    updateTileVisuals();
+                    checkWin();
+                } else {
+                    playClick();
+                    selectedTile.element.classList.remove('selected');
+                    selectedTile = tileObj;
+                    tileObj.element.classList.add('selected');
+                }
+            }
+        }
+
+        function clearSelectionHints() {
+            activeTiles.forEach(t => t.element.classList.remove('hinted'));
+        }
+
+        function formatContent(content) {
+            if (typeof content === 'string' && content.includes('[')) {
+                return content.replace(/\[(.*?)\]/g, '<span style="color: #FFD700; font-weight: 900; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);">$1</span>');
+            }
+            return content;
+        }
+
+        function buildBoard() {
+            boardEl.innerHTML = '';
+            activeTiles = [];
+            selectedTile = null;
+            winOverlay.style.display = 'none';
+
+            const mode = document.getElementById('mode-select').value;
+            const layoutKey = document.getElementById('layout-select').value;
+            
+            titleHeader.innerText = gameDatasets[mode].title;
+
+            const layoutCoords = layouts[layoutKey];
+            const deck = generateDeck(layoutCoords.length);
+
+            let minX = Infinity, maxX = -Infinity;
+            let minY = Infinity, maxY = -Infinity;
+
+            for (let i = 0; i < layoutCoords.length; i++) {
+                const coord = layoutCoords[i];
+                const cardData = deck[i];
+
+                minX = Math.min(minX, coord.x);
+                maxX = Math.max(maxX, coord.x);
+                minY = Math.min(minY, coord.y);
+                maxY = Math.max(maxY, coord.y);
+
+                const tileEl = document.createElement('div');
+                tileEl.className = 'tile';
+                
+                tileEl.innerHTML = `<span class="content ${cardData.type}">${formatContent(cardData.content)}</span>`;
+                
+                const zOffsetX = coord.z * -4; 
+                const zOffsetY = coord.z * -4; 
+
+                tileEl.style.left = (coord.x * TILE_WIDTH_UNIT + zOffsetX) + 'px';
+                tileEl.style.top = (coord.y * TILE_HEIGHT_UNIT + zOffsetY) + 'px';
+                tileEl.style.zIndex = coord.z * 10;
+
+                const tileObj = {
+                    x: coord.x,
+                    y: coord.y,
+                    z: coord.z,
+                    matchKey: cardData.matchKey,
+                    type: cardData.type,
+                    content: cardData.content,
+                    element: tileEl
+                };
+
+                tileEl.addEventListener('click', () => handleTileClick(tileObj));
+
+                activeTiles.push(tileObj);
+                boardEl.appendChild(tileEl);
+            }
+
+            const boardW = (maxX - minX + 2) * TILE_WIDTH_UNIT;
+            const boardH = (maxY - minY + 2) * TILE_HEIGHT_UNIT;
+            boardEl.style.width = boardW + 'px';
+            boardEl.style.height = boardH + 'px';
+
+            updateTileVisuals();
+            resizeBoard();
+        }
+
+        function resizeBoard() {
+            if (activeTiles.length === 0) return;
+            const bWidth = boardEl.offsetWidth;
+            const bHeight = boardEl.offsetHeight;
+            const cWidth = boardContainer.clientWidth;
+            const cHeight = boardContainer.clientHeight;
+
+            const scaleX = cWidth / bWidth;
+            const scaleY = cHeight / bHeight;
+            let scale = Math.min(scaleX, scaleY) * 0.95; 
+            
+            if (scale > 1.2) scale = 1.2;
+
+            boardEl.style.transform = `scale(${scale})`;
+        }
+
+        function checkWin() {
+            if (activeTiles.length === 0) {
+                winOverlay.style.display = 'flex';
+            }
+        }
+
+        function doShuffle() {
+            clearSelection();
+            if (activeTiles.length === 0) return;
+
+            let remainingData = activeTiles.map(t => ({
+                matchKey: t.matchKey,
+                type: t.type,
+                content: t.content
+            }));
+
+            remainingData = shuffleArray(remainingData);
+
+            for (let i = 0; i < activeTiles.length; i++) {
+                activeTiles[i].matchKey = remainingData[i].matchKey;
+                activeTiles[i].type = remainingData[i].type;
+                activeTiles[i].content = remainingData[i].content;
+                activeTiles[i].element.innerHTML = `<span class="content ${remainingData[i].type}">${formatContent(remainingData[i].content)}</span>`;
+            }
+        }
+
+        function doHint() {
+            clearSelection();
+            if (activeTiles.length === 0) return;
+
+            const freeTiles = activeTiles.filter(t => isTileFree(t));
+
+            for (let i = 0; i < freeTiles.length; i++) {
+                for (let j = i + 1; j < freeTiles.length; j++) {
+                    let t1 = freeTiles[i];
+                    let t2 = freeTiles[j];
+
+                    if (t1.matchKey === t2.matchKey && t1.type !== t2.type) {
+                        t1.element.classList.add('hinted');
+                        t2.element.classList.add('hinted');
+                        return;
+                    }
+                }
+            }
+
+            alert("No available matches! Try shuffling the board.");
+        }
+
+        window.addEventListener('resize', resizeBoard);
+        
+        document.getElementById('new-game-btn').addEventListener('click', buildBoard);
+        document.getElementById('mode-select').addEventListener('change', buildBoard);
+        document.getElementById('layout-select').addEventListener('change', buildBoard);
+        document.getElementById('hint-btn').addEventListener('click', doHint);
+        document.getElementById('shuffle-btn').addEventListener('click', doShuffle);
+
+        document.getElementById('mute-btn').addEventListener('click', (e) => {
+            isMuted = !isMuted;
+            e.target.innerText = isMuted ? '🔇' : '🔊';
+        });
+
+        document.getElementById('play-again-btn').addEventListener('click', buildBoard);
+
+        document.getElementById('rules-btn').addEventListener('click', () => {
+            const mode = document.getElementById('mode-select').value;
+            rulesText.innerText = gameDatasets[mode].rules;
+            rulesModal.style.display = 'flex';
+        });
+
+        document.getElementById('close-rules-btn').addEventListener('click', () => {
+            rulesModal.style.display = 'none';
+        });
+
+        rulesModal.addEventListener('click', (e) => {
+            if (e.target === rulesModal) {
+                rulesModal.style.display = 'none';
+            }
+        });
+
+        buildBoard();
+    </script>
+</body>
+</html>
